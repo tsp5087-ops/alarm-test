@@ -28,8 +28,9 @@ jobs:
       run: python app_monitor.py
 
     - name: (전부 실패 시) 슬랙 알림 발송 🚨
-      if: failure()  # 👈 위 단계에서 에러가 나면(10번 다 실패하면) 실행됨
+      if: failure()
+      shell: powershell   # 👈 윈도우 파워셸 모드 강제 적용
       run: |
-         curl -H "Content-Type: application/json" \
-              -d '{"text": "🚨 **[앱 비상]** 1분 동안 10번이나 로그인을 시도했지만 모두 실패했습니다! 앱 서버나 상태를 확인하세요."}' \
-              ${{ secrets.SLACK_WEBHOOK_URL }}
+        $headers = @{ "Content-Type" = "application/json" }
+        $body = '{"text": "🚨 **[앱 비상]** 1분 동안 10번 시도 실패! 서버 점검 요망."}'
+        Invoke-RestMethod -Uri "${{ secrets.SLACK_WEBHOOK_URL }}" -Method Post -Headers $headers -Body $body
