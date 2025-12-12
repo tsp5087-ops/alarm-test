@@ -1,0 +1,27 @@
+name: 야구 알리미 ⚾️
+
+on: [push]  # 코드가 올라오면(Push) 무조건 실행!
+
+jobs:
+  play-baseball:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 코드 가져오기 📥
+      uses: actions/checkout@v3
+
+    - name: 파이썬 설치하기 🐍
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: 야구 게임 시작 (bomb.py 실행) 🏟️
+      run: python bomb.py
+
+    - name: (에러나면) 친구에게 알람 보내기 🚨
+      if: failure()  # 👈 중요! 위 단계가 실패했을 때만 실행됨
+      run: |
+        echo "야구장 난동 발생! 알림을 보냅니다..."
+        curl -H "Content-Type: application/json" \
+             -d '{"content": "🚨 **[긴급]** 9회말 2아웃 만루! 친구가 야구를 못해서 에러가 났습니다! \n> _혹시 야구 하루이틀 하시나요?_"}' \
+             ${{ secrets.DISCORD_WEBHOOK_URL }}
