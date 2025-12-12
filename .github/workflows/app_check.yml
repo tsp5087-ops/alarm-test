@@ -7,7 +7,7 @@ on:
 
 jobs:
   mobile-test:
-    runs-on: self-hosted   # 👈 [중요] 내 PC에서 실행하겠다는 뜻!
+    runs-on: ubuntu-latest
     
     steps:
     - name: 코드 가져오기 📥
