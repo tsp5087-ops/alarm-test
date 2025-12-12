@@ -1,6 +1,8 @@
 name: 야구 알리미 ⚾️
 
-on: [push]  # 코드가 올라오면(Push) 무조건 실행!
+on:
+  push:
+  workflow_dispatch:  # 👈 이 줄을 추가하면 '수동 실행 버튼'이 생깁니다!
 
 jobs:
   play-baseball:
