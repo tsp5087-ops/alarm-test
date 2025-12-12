@@ -1,0 +1,35 @@
+name: 모바일 앱 생존 신고 📱
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'  # 30분마다 실행
+  workflow_dispatch:        # 수동 실행 버튼
+
+jobs:
+  mobile-test:
+    runs-on: self-hosted   # 👈 [중요] 내 PC에서 실행하겠다는 뜻!
+    
+    steps:
+    - name: 코드 가져오기 📥
+      uses: actions/checkout@v3
+
+    - name: 파이썬 세팅 🐍
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: 필요 라이브러리 설치
+      run: pip install Appium-Python-Client selenium
+
+    - name: 앱 로그인 10번 시도 (실패 시 에러 발생) 👊
+      env:
+        MY_ID: ${{ secrets.MY_ID }}    # 깃허브 금고의 아이디
+        MY_PW: ${{ secrets.MY_PW }}    # 깃허브 금고의 비번
+      run: python app_monitor.py
+
+    - name: (전부 실패 시) 슬랙 알림 발송 🚨
+      if: failure()  # 👈 위 단계에서 에러가 나면(10번 다 실패하면) 실행됨
+      run: |
+         curl -H "Content-Type: application/json" \
+              -d '{"text": "🚨 **[앱 비상]** 1분 동안 10번이나 로그인을 시도했지만 모두 실패했습니다! 앱 서버나 상태를 확인하세요."}' \
+              ${{ secrets.SLACK_WEBHOOK_URL }}
